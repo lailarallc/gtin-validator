@@ -450,3 +450,14 @@ Consolidate `render_group_with_continuation` and `render_multi_issue_group` into
 
 ### Context
 Phase 2 finding #10. Two nearly identical functions at pdf_report.py:375-455.
+
+---
+
+## Improvement History
+
+### 2026-09-23 — Audit (health check only)
+- **Findings:** 1 critical, 5 important, 4 nice-to-have
+- **Top concerns:** Duplicate detection is quadratic and writes every other row number into every duplicate's message — 3,000 identical GTINs took 1.5s and 51 MB of message text, so a single 10,000-row POST can OOM the 512 MB Fly VM. ENVIRONMENT=production is never set, so /api/docs and /openapi.json are live on gtin.lailarallc.com (the 2026-05-22 decision is inert). Non-ASCII digits (e.g. superscript 2) pass isdigit() then crash int() with an unhandled 500; the cost section's "warning items" (7 on sample data) disagrees with the summary's Warnings (4).
+- **Other:** Rate limiter keys on the proxy IP behind Cloudflare/Fly (likely one shared 10/min bucket; no 429 test despite FAILURES.md lesson); Fly deploy doesn't wait on CI and uses setup-flyctl@master; README still points at MsShawnP URLs and lists render.yaml; client-mode.yml comment says v0.2.1 but installs v0.2.2; Source Sans @font-face declares 400-700 on a static 400 woff2 (faux-bold 600). Manual security/code/data pass replaced automated reviews. 90 tests pass, ruff clean.
+- **Action taken:** Audit only — no fixes this session
+- **Next review:** 2026-12-22
