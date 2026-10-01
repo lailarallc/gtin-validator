@@ -1,8 +1,8 @@
 {
  "_generated": {
-  "generated": "2026-08-01",
+  "generated": "2026-10-01",
   "generator": "scripts/verify_canonical.py",
-  "platform_head": "c94fd39",
+  "platform_head": "deb0175",
   "source": "reference/canonical_values.yml",
   "verified_against_production": "2026-07-29"
  },
@@ -219,6 +219,68 @@
    "trailing_36m": 49
   }
  },
+ "fulfillment": {
+  "fill_rate_internal_pct": {
+   "cy2023": 99.24,
+   "cy2024": 99.26,
+   "cy2025": 99.21,
+   "full_corpus": 99.23,
+   "trailing_12m": 99.21,
+   "trailing_24m": 99.23,
+   "trailing_36m": 99.23
+  },
+  "gap_walmart_pts": {
+   "cy2023": 14.99,
+   "cy2024": 14.34,
+   "cy2025": 15.09,
+   "full_corpus": 14.78,
+   "trailing_12m": 15.09,
+   "trailing_24m": 14.71,
+   "trailing_36m": 14.79
+  },
+  "in_full_walmart_pct": {
+   "cy2023": 86.37,
+   "cy2024": 86.79,
+   "cy2025": 86.2,
+   "full_corpus": 86.47,
+   "trailing_12m": 86.2,
+   "trailing_24m": 86.5,
+   "trailing_36m": 86.46
+  },
+  "on_time_walmart_pct": {
+   "cy2023": 97.67,
+   "cy2024": 97.9,
+   "cy2025": 97.63,
+   "full_corpus": 97.74,
+   "trailing_12m": 97.63,
+   "trailing_24m": 97.76,
+   "trailing_36m": 97.73
+  },
+  "otif_portfolio_pct": {
+   "cy2023": 88.23,
+   "cy2024": 88.36,
+   "cy2025": 87.88,
+   "full_corpus": 88.16,
+   "trailing_12m": 87.88,
+   "trailing_24m": 88.12,
+   "trailing_36m": 88.16
+  },
+  "otif_walmart_pct": {
+   "cy2023": 84.25,
+   "cy2024": 84.92,
+   "cy2025": 84.12,
+   "full_corpus": 84.45,
+   "trailing_12m": 84.12,
+   "trailing_24m": 84.52,
+   "trailing_36m": 84.44
+  },
+  "provenance": "recomputed 2026-09-17 from otif-blind-spot scripts/cache/platform_fulfillment.json (read-only Fly proxy pull 2026-06-30); pending canonical_gather.sql",
+  "rendered_pair": "99% / 84%",
+  "shipments": {
+   "all_retailers_full_corpus": 46760,
+   "walmart_full_corpus": 10124
+  }
+ },
  "margin": {
   "contribution_commercial_pct": {
    "all_time": 49.01
@@ -432,10 +494,6 @@
    "token": "$430K"
   },
   {
-   "reason": "retired PDHA product-data cost (pre-reseed calibration); current is $93K",
-   "token": "$296K"
-  },
-  {
    "reason": "retired panel projection factor k; k is absent (no table/column) \u2014 see absent.panel_projection_factor_k. NB: bare \"166.5\" is intentionally NOT a token \u2014 it collides with legitimate $166.50 money values in deduction/chargeback data.",
    "token": "166.488"
   },
@@ -446,6 +504,42 @@
   {
    "reason": "retired figure, no-$ form",
    "token": "82,924"
+  },
+  {
+   "reason": "retired OTIF internal/retailer pair (superseded 2026-06-14); current fulfillment.* = 99.2% fill / 84.5% of Walmart shipments on time and complete, rendered 99% / 84%",
+   "token": "95%/86%"
+  },
+  {
+   "reason": "retired homepage/journey rendering (\"you ship 95% complete\"); current is 99% complete",
+   "token": "95% complete"
+  },
+  {
+   "reason": "retired homepage/journey rendering (\"Walmart scores you at 86%\"); 84% is not a Walmart score either \u2014 see 2026-09-29 relabel",
+   "token": "scores you at 86%"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "Walmart scores you at 84%"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "scores you at 84%"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "Walmart Scores You 84%"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "retailer-scored OTIF"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "Walmart-scored"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "84% OTIF"
   },
   {
    "reason": "retired all-in trade cost (old seed rates); current ~$3.6M/yr",
@@ -462,6 +556,46 @@
   {
    "reason": "retired May-2026 SQLite all-in export, full $ form",
    "token": "$7,174,939"
+  },
+  {
+   "reason": "retired 8-dimension short-ship cost model (spelled-out form); replaced 2026-06-14 by the 4-dimension model",
+   "token": "eight cost dimensions"
+  },
+  {
+   "reason": "retired defect-SKU TTM rendering; current revenue.defect_sku_ttm = $19,487,913.16 ($19.5M)",
+   "token": "$19.6M"
+  },
+  {
+   "reason": "retired thesis range (en-dash form); superseded 2026-06-14, current range $1.4M\u2013$2.3M/yr",
+   "token": "$1.4M\u2013$3.1M"
+  },
+  {
+   "reason": "retired thesis range (ASCII-hyphen form of the same range)",
+   "token": "$1.4M-$3.1M"
+  },
+  {
+   "reason": "retired deduction-backlog rendering (old copy \u2192 now $1.35M). NB: rounds the LIVE trade.structural_allowance.cy2025 ($1,653,699.53) \u2014 a legitimate structural-allowance rendering must use the full figure or be allowlisted.",
+   "token": "$1.65M"
+  },
+  {
+   "reason": "retired retailer-chargeback annual figure; current cy2025 retailer chargeback amount is $134,314.20",
+   "token": "$228,845"
+  },
+  {
+   "reason": "retired lifecycle rendering (the-ten-decisions/contract-to-cash \"83 cents arrived\"); current is 87\u00a2. Scoped to the full phrase so it does NOT collide with the LIVE bare \"83 cents\" DTC-margin figure in channel-profitability-analysis.",
+   "token": "83 cents arrived"
+  },
+  {
+   "reason": "retired per-load ASN/short-ship penalty assumption. Allowlisted in the-ten-decisions/research/cinderhaven-findings.md (research notes only) where it is a stated assumption, not a canonical figure.",
+   "token": "$500 per load"
+  },
+  {
+   "reason": "short-ship pre-2026-09-30 Walmart rule; current $296K/yr, $888K/3yr",
+   "token": "$298K"
+  },
+  {
+   "reason": "short-ship pre-2026-09-30 Walmart rule; current $296K/yr, $888K/3yr",
+   "token": "$894K"
   }
  ],
  "trade": {
