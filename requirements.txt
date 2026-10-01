@@ -5,3 +5,8 @@ pandas>=2.0.0
 openpyxl>=3.1.0
 reportlab>=4.0.0
 slowapi>=0.1.9
+# Transitive (slowapi -> limits -> deprecated). deprecated 3.0.0 needs Python
+# >=3.12 and uses 3.12-only syntax that mypy (python_version = 3.10) rejects.
+# 1.3.1 is the last version CI passed with (2026-09-05). Drop this pin when
+# mypy targets 3.12+.
+deprecated==1.3.1
