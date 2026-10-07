@@ -2,7 +2,7 @@
 
 **Source:** Free app limit build plan (2026-10-07)
 **Branch:** `free-app-limit` — PR only, do not merge. Merge on launch day (Fri 2026-10-16) once the kit is on Payhip and lailarallc.com/kits/gtin-validator is live.
-**Status:** In progress
+**Status:** Built — PR open, merge on launch day (2026-10-16)
 
 **Goal:** Sample data keeps the full report and downloads. Own data (upload or paste) shows only score, grade, and issue counts, with no row-level detail and no downloads, and points to the GTIN Validator Kit. The server enforces the limit.
 
@@ -13,7 +13,7 @@
 - [x] 2. Change the results screens — `SummaryResponse` in api.ts, `runSample()`, own-data CTA, sample CTA, remove "free read" lines and `/services` links
 - [x] 3. Update the page copy — index.html meta/og description, HeroSection subtitle + "What you'll need" card
 - [x] 4. Fix the sample PDF — ● → •, ✓/✗ → PASS/FAIL, new closing paragraph, no U+25CF/U+2713/U+2717 in extracted text
-- [ ] 5. Wrap up — DECISIONS.md entry, HANDOFF.md, open PR (don't merge)
+- [x] 5. Wrap up — DECISIONS.md entry, HANDOFF.md, open PR (don't merge)
 
 ---
 

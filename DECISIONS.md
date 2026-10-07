@@ -1,5 +1,17 @@
 # Decisions Log
 
+## 2026-10-07: Own-data results are summary-only; the server enforces it
+
+**Decision:** The free app returns only `{ summary, score }` for the user's own data (paste or upload). Row-level detail, the analysis sections, and the CSV/PDF downloads exist only for the sample, via `POST /api/sample/validate`. The full report for your own file is the GTIN Validator Kit.
+
+**Why:** The free app is the funnel to the GTIN Validator Kit. Hiding detail in the UI isn't a limit: anyone could read the JSON or call the report endpoints. So the server never builds or caches detail for own data.
+
+**How it's enforced:** `/api/validate` and `/api/validate/upload` return `SummaryResponse`, store nothing in the cache, and issue no token. Only `/api/sample/validate` stores a result and issues a token, so the report and completeness endpoints can only ever serve the sample. Any other token returns 404 ("Validation result expired or not found."). `tests_api.py` locks the exact own-data keys and the 404.
+
+**Scope:** `backend/routes/validate.py`, `backend/schemas/responses.py`, the frontend results screens. `gtin_core.py` is unchanged; the engine computes the same full result and the route discards everything but summary and score.
+
+**Do not:** Return a token, `results`, or any other `ValidationResponse` field from an own-data endpoint, or cache own-data results, even to support a "nicer" feature. Gate by not producing the data, not by hiding it in the UI.
+
 ## 2026-09-02: Hosting is Fly.io; Render is retired
 
 **Decision:** gtin-validator is hosted on Fly.io. Render is retired.
