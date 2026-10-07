@@ -9,7 +9,7 @@
 **Constraints:** Don't touch `gtin_core.py`; `test_golden.py` passes unchanged. One commit per step. No raw exceptions in API errors.
 
 - [x] 0. Set up — branch `free-app-limit`, plan in PLAN.md
-- [ ] 1. Limit the server — `POST /api/sample/validate` (full response + token); own-data endpoints return `{ summary, score }` only, no cache, no token; tests
+- [x] 1. Limit the server — `POST /api/sample/validate` (full response + token); own-data endpoints return `{ summary, score }` only, no cache, no token; tests
 - [ ] 2. Change the results screens — `SummaryResponse` in api.ts, `runSample()`, own-data CTA, sample CTA, remove "free read" lines and `/services` links
 - [ ] 3. Update the page copy — index.html meta/og description, HeroSection subtitle + "What you'll need" card
 - [ ] 4. Fix the sample PDF — ● → •, ✓/✗ → PASS/FAIL, new closing paragraph, no U+25CF/U+2713/U+2717 in extracted text

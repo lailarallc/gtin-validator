@@ -1,6 +1,7 @@
 """API endpoint tests for the FastAPI backend."""
 
 import csv
+import uuid
 from io import StringIO
 
 import pytest
@@ -62,65 +63,58 @@ class TestSampleAndRetailers:
 
 class TestValidateText:
     @pytest.mark.anyio
-    async def test_valid_gtins(self, client):
+    async def test_own_data_is_summary_only(self, client):
         resp = await client.post("/api/validate", json={"gtins": VALID_GTINS})
         assert resp.status_code == 200
         data = resp.json()
-        assert data["token"]
+        assert set(data.keys()) == {"summary", "score"}
         assert data["summary"]["total_gtins"] == 3
-        assert data["score"]["score"] >= 0
         assert data["score"]["grade"] in ("A", "B", "C", "D", "F", "N/A")
-        assert isinstance(data["results"], list)
-        assert len(data["results"]) == 3
-        assert isinstance(data["executive_summary"], str)
-        assert isinstance(data["fix_roadmap"], list)
-        assert isinstance(data["before_after"], list)
-        assert isinstance(data["gtin14_suggestions"], list)
 
     @pytest.mark.anyio
-    async def test_invalid_gtin_flagged(self, client):
+    async def test_invalid_gtin_counted(self, client):
         resp = await client.post("/api/validate", json={"gtins": [INVALID_GTIN]})
         assert resp.status_code == 200
-        data = resp.json()
-        result = data["results"][0]
-        assert result["has_critical"] or any(
-            i["code"] == "BAD_CHECK_DIGIT" for i in result["issues"]
-        )
+        assert resp.json()["summary"]["critical_issues"] == 1
 
     @pytest.mark.anyio
     async def test_empty_list_rejected(self, client):
         resp = await client.post("/api/validate", json={"gtins": []})
         assert resp.status_code == 400
 
-    @pytest.mark.anyio
-    async def test_retailer_checklists_present(self, client):
-        resp = await client.post("/api/validate", json={"gtins": VALID_GTINS})
-        data = resp.json()
-        assert "Walmart" in data["retailer_checklists"]
-        checklist = data["retailer_checklists"]["Walmart"]
-        assert "checks" in checklist
-        assert "ready" in checklist
 
-    @pytest.mark.anyio
-    async def test_hierarchy_structure(self, client):
-        resp = await client.post("/api/validate", json={"gtins": VALID_GTINS})
-        data = resp.json()
-        h = data["hierarchy"]
-        assert "matched_pairs" in h
-        assert "orphan_cases" in h
-        assert "units_without_cases" in h
-        assert isinstance(h["has_hierarchy"], bool)
+# ---------------------------------------------------------------------------
+# Validation — sample data (the only path that returns the full report)
+# ---------------------------------------------------------------------------
 
+
+class TestValidateSample:
     @pytest.mark.anyio
-    async def test_cost_estimate_structure(self, client):
-        resp = await client.post(
-            "/api/validate", json={"gtins": [INVALID_GTIN]}
-        )
+    async def test_sample_full_response(self, client):
+        resp = await client.post("/api/sample/validate")
+        assert resp.status_code == 200
         data = resp.json()
-        cost = data["cost_estimate"]
-        assert cost is not None
-        assert "chargeback_range" in cost
-        assert "annual_estimate_low" in cost
+        assert data["token"]
+        assert data["score"]["score"] == 82
+        assert data["score"]["grade"] == "B"
+        # Same summary locked in test_golden.py
+        assert data["summary"] == {
+            "total_gtins": 46,
+            "valid": 40,
+            "critical_issues": 6,
+            "warnings": 4,
+            "clean": 36,
+            "duplicate_groups": 2,
+            "unique_prefixes": 3,
+        }
+        assert len(data["results"]) == 46
+        assert isinstance(data["executive_summary"], str)
+        assert isinstance(data["fix_roadmap"], list)
+        assert isinstance(data["before_after"], list)
+        assert isinstance(data["gtin14_suggestions"], list)
+        assert "checks" in data["retailer_checklists"]["Walmart"]
+        assert "matched_pairs" in data["hierarchy"]
+        assert data["cost_estimate"] is not None
 
 
 # ---------------------------------------------------------------------------
@@ -136,6 +130,7 @@ class TestValidateUpload:
         resp = await client.post("/api/validate/upload", files=files)
         assert resp.status_code == 200
         data = resp.json()
+        assert set(data.keys()) == {"summary", "score"}
         assert data["summary"]["total_gtins"] == 2
 
     @pytest.mark.anyio
@@ -173,7 +168,7 @@ class TestValidateUpload:
 class TestReports:
     @pytest.fixture
     async def token(self, client):
-        resp = await client.post("/api/validate", json={"gtins": VALID_GTINS})
+        resp = await client.post("/api/sample/validate")
         return resp.json()["token"]
 
     @pytest.mark.anyio
@@ -213,6 +208,25 @@ class TestReports:
         resp = await client.get("/api/reports/csv/nonexistent_token")
         assert resp.status_code == 404
 
+    @pytest.mark.anyio
+    @pytest.mark.parametrize(
+        "path",
+        [
+            "/api/reports/csv/{t}",
+            "/api/reports/corrected/{t}",
+            "/api/reports/pdf/{t}",
+            "/api/completeness/{t}",
+        ],
+    )
+    async def test_non_sample_token_404(self, client, path):
+        # Own-data calls issue no token, so any token not from the sample
+        # endpoint (well-formed or not) must 404 on every report endpoint.
+        await client.post("/api/validate", json={"gtins": VALID_GTINS})
+        for t in ("not-a-token", uuid.uuid4().hex):
+            resp = await client.get(path.format(t=t))
+            assert resp.status_code == 404
+            assert resp.json() == {"detail": "Validation result expired or not found."}
+
 
 # ---------------------------------------------------------------------------
 # Data completeness
@@ -220,25 +234,13 @@ class TestReports:
 
 
 class TestCompleteness:
-    @pytest.fixture
-    async def token_with_data(self, client):
-        csv_content = (
-            "GTIN,Product Name,Brand,Weight\n"
-            "614141000012,Marinara Sauce,Cedar Hollow,24oz\n"
-            "614141000029,Pesto,Cedar Hollow,8oz\n"
-        )
-        files = {"file": ("products.csv", csv_content.encode(), "text/csv")}
-        resp = await client.post("/api/validate/upload", files=files)
-        return resp.json()["token"]
-
     @pytest.mark.anyio
-    async def test_completeness(self, client, token_with_data):
-        resp = await client.get(f"/api/completeness/{token_with_data}")
-        assert resp.status_code == 200
-        data = resp.json()
-        assert "field_analysis" in data
-        assert "missing_important_fields" in data
-        assert "overall_completeness" in data
+    async def test_completeness_sample_has_no_file_data(self, client):
+        # The sample is validated from its GTIN column only, as before, so
+        # there is no product data to analyze.
+        token = (await client.post("/api/sample/validate")).json()["token"]
+        resp = await client.get(f"/api/completeness/{token}")
+        assert resp.status_code == 400
 
     @pytest.mark.anyio
     async def test_completeness_expired_token(self, client):

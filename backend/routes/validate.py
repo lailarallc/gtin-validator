@@ -10,9 +10,12 @@ from backend.cache import get_result, store_result
 from backend.limiter import limiter
 from backend.schemas.requests import ValidateTextRequest
 from backend.schemas.responses import (
+    BatchSummaryOut,
     DataCompletenessOut,
     FieldAnalysisOut,
     RetailerDataGapOut,
+    ScoreResultOut,
+    SummaryResponse,
     ValidationResponse,
 )
 from backend.serializers import serialize_batch_result
@@ -24,6 +27,7 @@ from gtin_core import (
     generate_gtin14_suggestions,
     validate_batch,
 )
+from sample_data import SAMPLE_DATA
 
 router = APIRouter()
 
@@ -69,18 +73,51 @@ def _run_validation(gtins: list[str], df: pd.DataFrame | None = None) -> tuple[d
     return response_data, token
 
 
-@router.post("/validate", response_model=ValidationResponse, responses={429: {"description": "Rate limit exceeded"}})
+def _run_summary(gtins: list[str]) -> SummaryResponse:
+    """Own-data path: score and counts only. Nothing is cached, no token issued."""
+    validation_data = validate_batch(gtins[:MAX_GTINS])
+    return SummaryResponse(
+        summary=BatchSummaryOut(**validation_data["summary"]),
+        score=ScoreResultOut(**validation_data["score"]),
+    )
+
+
+def _sample_gtins() -> list[str]:
+    """Take the GTIN column from SAMPLE_DATA the way the frontend parsed it."""
+    lines = SAMPLE_DATA.strip().split("\n")
+    columns = [c.strip() for c in lines[0].split(",")]
+    idx = columns.index("GTIN")
+    gtins = []
+    for line in lines[1:]:
+        values = line.split(",")
+        value = values[idx].strip() if idx < len(values) else ""
+        if value:
+            gtins.append(value)
+    return gtins
+
+
+@router.post(
+    "/sample/validate",
+    response_model=ValidationResponse,
+    responses={429: {"description": "Rate limit exceeded"}},
+)
 @limiter.limit("10/minute")
-def validate_text(request: Request, body: ValidateTextRequest) -> dict:
+def validate_sample(request: Request) -> dict:
+    response_data, _ = _run_validation(_sample_gtins())
+    return response_data
+
+
+@router.post("/validate", response_model=SummaryResponse, responses={429: {"description": "Rate limit exceeded"}})
+@limiter.limit("10/minute")
+def validate_text(request: Request, body: ValidateTextRequest) -> SummaryResponse:
     if not body.gtins:
         raise HTTPException(400, "No GTINs provided.")
-    response_data, _ = _run_validation(body.gtins)
-    return response_data
+    return _run_summary(body.gtins)
 
 
 @router.post(
     "/validate/upload",
-    response_model=ValidationResponse,
+    response_model=SummaryResponse,
     responses={429: {"description": "Rate limit exceeded"}},
 )
 @limiter.limit("10/minute")
@@ -88,7 +125,7 @@ def validate_upload(
     request: Request,
     file: UploadFile,
     gtin_column: str | None = None,
-) -> dict:
+) -> SummaryResponse:
     if not file.filename:
         raise HTTPException(400, "No file provided.")
 
@@ -117,8 +154,7 @@ def validate_upload(
     if not gtins:
         raise HTTPException(400, f"No GTINs found in column '{col}'.")
 
-    response_data, _ = _run_validation(gtins, df)
-    return response_data
+    return _run_summary(gtins)
 
 
 @router.get("/completeness/{token}")
