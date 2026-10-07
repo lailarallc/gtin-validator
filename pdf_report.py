@@ -59,6 +59,11 @@ def severity_color(severity):
     return INFO
 
 
+def check_name(check: dict) -> str:
+    """Retailer check name with arrows spelled out: the brand fonts have no U+2192."""
+    return str(check["check"]).replace(" → ", "-to-")
+
+
 def generate_pdf_report(validation_data: BatchResult, company_name: str = "") -> BytesIO:
     """Generate a branded PDF report and return as BytesIO."""
     register_fonts()
@@ -322,7 +327,7 @@ def generate_pdf_report(validation_data: BatchResult, company_name: str = "") ->
             icon_color = GREEN if check["passed"] else RED
             elements.append(Paragraph(
                 f'<font color="{icon_color.hexval()}">{icon}</font>  '
-                f'{check["check"]} — <i>{check["detail"]}</i>',
+                f'{check_name(check)} — <i>{check["detail"]}</i>',
                 ParagraphStyle("CheckItem", parent=body_style, fontSize=9, leftIndent=20),
             ))
 
@@ -343,7 +348,7 @@ def generate_pdf_report(validation_data: BatchResult, company_name: str = "") ->
                 # Try to keep the whole group together
                 block = []
                 block.append(Paragraph(
-                    f'<font color="{RED.hexval()}">FAIL</font> <b>{check["check"]}</b> — '
+                    f'<font color="{RED.hexval()}">FAIL</font> <b>{check_name(check)}</b> — '
                     f'{len(failing)} GTIN(s)',
                     ParagraphStyle("FailGroup", parent=body_style, fontSize=10,
                                    spaceBefore=10, leftIndent=20),
@@ -368,7 +373,7 @@ def generate_pdf_report(validation_data: BatchResult, company_name: str = "") ->
                             elements.append(PageBreak())
                             elements.append(Paragraph(
                                 f'<font color="{RED.hexval()}">FAIL</font> '
-                                f'<b>{check["check"]} — continued</b>',
+                                f'<b>{check_name(check)} — continued</b>',
                                 ParagraphStyle("FailGroupCont", parent=body_style,
                                                fontSize=10, spaceBefore=10, leftIndent=20),
                             ))
