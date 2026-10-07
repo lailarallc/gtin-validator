@@ -5,9 +5,9 @@ export default function HeroSection() {
     <section className={styles.hero}>
       <h2 className={styles.title}>Validate your product GTINs in seconds</h2>
       <p className={styles.subtitle}>
-        Find data quality issues before retailers do. Check your GTINs against
-        GS1 format standards and retailer requirement rules &mdash; get a
-        readiness score, prioritized fix plan, and branded PDF report.
+        Find data quality issues before retailers do. Get a free readiness
+        score and issue counts for your GTINs. Try the sample to see the full
+        report the GTIN Validator Kit gives you.
       </p>
       <div className={styles.cards}>
         <div className={styles.card}>
@@ -30,9 +30,9 @@ export default function HeroSection() {
         <div className={styles.card}>
           <strong>What you'll need</strong>
           <p>
-            A list of GTINs &mdash; upload a CSV or Excel file, or paste them
-            directly. No account needed. Your file is never stored &mdash;
-            results are held in memory for 30 minutes, then discarded.
+            A list of GTINs. Upload a CSV or Excel file, or paste them. No
+            account needed. Your file isn&apos;t stored: results are discarded
+            as soon as they&apos;re shown.
           </p>
         </div>
       </div>
