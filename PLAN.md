@@ -1,4 +1,24 @@
-# GTIN Validator — Prospect-Readiness Plan
+# GTIN Validator — Free App Limit Plan
+
+**Source:** Free app limit build plan (2026-10-07)
+**Branch:** `free-app-limit` — PR only, do not merge. Merge on launch day (Fri 2026-10-16) once the kit is on Payhip and lailarallc.com/kits/gtin-validator is live.
+**Status:** In progress
+
+**Goal:** Sample data keeps the full report and downloads. Own data (upload or paste) shows only score, grade, and issue counts, with no row-level detail and no downloads, and points to the GTIN Validator Kit. The server enforces the limit.
+
+**Constraints:** Don't touch `gtin_core.py`; `test_golden.py` passes unchanged. One commit per step. No raw exceptions in API errors.
+
+- [x] 0. Set up — branch `free-app-limit`, plan in PLAN.md
+- [ ] 1. Limit the server — `POST /api/sample/validate` (full response + token); own-data endpoints return `{ summary, score }` only, no cache, no token; tests
+- [ ] 2. Change the results screens — `SummaryResponse` in api.ts, `runSample()`, own-data CTA, sample CTA, remove "free read" lines and `/services` links
+- [ ] 3. Update the page copy — index.html meta/og description, HeroSection subtitle + "What you'll need" card
+- [ ] 4. Fix the sample PDF — ● → •, ✓/✗ → PASS/FAIL, new closing paragraph, no U+25CF/U+2713/U+2717 in extracted text
+- [ ] 5. Wrap up — DECISIONS.md entry, HANDOFF.md, open PR (don't merge)
+
+---
+
+# Prior plan: Prospect-Readiness (complete)
+
 
 **Source:** Full project audit v2 (2026-05-16)
 **Tier:** Medium
