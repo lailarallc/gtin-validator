@@ -16,10 +16,11 @@ import Header from './components/Header'
 import HeroSection from './components/HeroSection'
 import InputSection from './components/InputSection'
 import NavigationSidebar from './components/NavigationSidebar'
-import ResultsCTA from './components/ResultsCTA'
+import ResultsCTA, { SampleCTA } from './components/ResultsCTA'
 import ScoreCard from './components/ScoreCard'
 import SummaryStats from './components/SummaryStats'
 import { appReducer, initialState } from './reducer'
+import { isFullReport } from './types'
 
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialState)
@@ -73,14 +74,21 @@ export default function App() {
           <ScoreCard score={data.score} />
           <SummaryStats summary={data.summary} />
 
-          <ResultsCTA
-            score={data.score.score}
-            grade={data.score.grade}
-            total={data.summary.total_gtins}
-            criticalCount={data.summary.critical_issues}
-            warningCount={data.summary.warnings}
-            companyName={state.companyName}
-          />
+          {!isFullReport(data) && (
+            <ResultsCTA
+              score={data.score.score}
+              grade={data.score.grade}
+              total={data.summary.total_gtins}
+              criticalCount={data.summary.critical_issues}
+              warningCount={data.summary.warnings}
+            />
+          )}
+        </>
+      )}
+
+      {state.phase === 'results' && data && isFullReport(data) && (
+        <>
+          <SampleCTA />
 
           <hr className="divider" />
 

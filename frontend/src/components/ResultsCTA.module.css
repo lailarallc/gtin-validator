@@ -10,6 +10,11 @@
   border-color: var(--color-accent);
 }
 
+.warning {
+  background: var(--color-warning-light);
+  border-color: var(--color-warning);
+}
+
 .clean {
   background: var(--color-success-light);
   border-color: var(--color-success);
@@ -26,15 +31,23 @@
   max-width: 640px;
 }
 
-.helper {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  margin-top: var(--space-sm);
-  margin-bottom: var(--space-md) !important;
+/* Link styled as a button: keep button ink, beating the global a / a:hover. */
+.cta a:global(.btn-primary),
+.cta a:global(.btn-primary):hover {
+  color: var(--color-white);
+  text-decoration: none;
 }
 
 .secondary {
-  display: inline-block;
+  display: block;
+  margin-top: var(--space-md);
   font-weight: 600;
   color: var(--color-primary);
+}
+
+.questions {
+  display: block;
+  margin-top: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
 }

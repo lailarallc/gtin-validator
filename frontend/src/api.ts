@@ -1,4 +1,4 @@
-import type { DataCompleteness, SampleData, ValidationResponse } from './types'
+import type { DataCompleteness, SampleData, SummaryResponse, ValidationResponse } from './types'
 
 const BASE = import.meta.env.VITE_API_URL || ''
 
@@ -30,7 +30,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   }
 }
 
-export async function validateGtins(gtins: string[]): Promise<ValidationResponse> {
+export async function validateGtins(gtins: string[]): Promise<SummaryResponse> {
   return request('/api/validate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -41,7 +41,7 @@ export async function validateGtins(gtins: string[]): Promise<ValidationResponse
 export async function validateUpload(
   file: File,
   gtinColumn?: string,
-): Promise<ValidationResponse> {
+): Promise<SummaryResponse> {
   const form = new FormData()
   form.append('file', file)
   const params = gtinColumn ? `?gtin_column=${encodeURIComponent(gtinColumn)}` : ''
@@ -49,6 +49,10 @@ export async function validateUpload(
     method: 'POST',
     body: form,
   })
+}
+
+export async function runSample(): Promise<ValidationResponse> {
+  return request('/api/sample/validate', { method: 'POST' })
 }
 
 export async function fetchSampleData(): Promise<SampleData> {
