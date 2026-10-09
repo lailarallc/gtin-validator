@@ -3,21 +3,6 @@ import * as api from '../api'
 import type { AppAction, AppState } from '../types'
 import styles from './InputSection.module.css'
 
-function parseCsvText(text: string): { columns: string[]; rows: Record<string, string>[] } {
-  const lines = text.trim().split('\n')
-  if (lines.length < 2) return { columns: [], rows: [] }
-  const columns = lines[0].split(',').map((c) => c.trim())
-  const rows = lines.slice(1).map((line) => {
-    const values = line.split(',')
-    const row: Record<string, string> = {}
-    columns.forEach((col, i) => {
-      row[col] = (values[i] ?? '').trim()
-    })
-    return row
-  })
-  return { columns, rows }
-}
-
 interface Props {
   state: AppState
   dispatch: React.Dispatch<AppAction>
@@ -83,10 +68,7 @@ export default function InputSection({ state, dispatch }: Props) {
     dispatch({ type: 'SET_INPUT_METHOD', method: 'sample' })
     dispatch({ type: 'VALIDATION_START' })
     try {
-      const sample = await api.fetchSampleData()
-      const { rows } = parseCsvText(sample.csv)
-      const gtins = rows.map((r) => r['GTIN']).filter(Boolean)
-      const data = await api.validateGtins(gtins)
+      const data = await api.runSample()
       dispatch({ type: 'VALIDATION_SUCCESS', data })
     } catch (e) {
       dispatch({

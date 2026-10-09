@@ -181,6 +181,18 @@ export interface ValidationResponse {
   gtin14_suggestions: GTIN14Suggestion[]
 }
 
+// Own-data result: score and issue counts only. No rows, no token.
+export interface SummaryResponse {
+  summary: BatchSummary
+  score: ScoreResult
+}
+
+export function isFullReport(
+  data: ValidationResponse | SummaryResponse,
+): data is ValidationResponse {
+  return 'token' in data
+}
+
 export interface SampleData {
   csv: string
   description: string
@@ -204,7 +216,7 @@ export interface AppState {
   phase: Phase
   inputMethod: InputMethod
   parsedFile: ParsedFile | null
-  validationData: ValidationResponse | null
+  validationData: ValidationResponse | SummaryResponse | null
   companyName: string
   selectedRetailer: string
   activeSection: string
@@ -215,7 +227,7 @@ export type AppAction =
   | { type: 'SET_INPUT_METHOD'; method: InputMethod }
   | { type: 'FILE_PARSED'; payload: ParsedFile }
   | { type: 'VALIDATION_START' }
-  | { type: 'VALIDATION_SUCCESS'; data: ValidationResponse }
+  | { type: 'VALIDATION_SUCCESS'; data: ValidationResponse | SummaryResponse }
   | { type: 'VALIDATION_ERROR'; error: string }
   | { type: 'START_OVER' }
   | { type: 'SET_COMPANY_NAME'; name: string }

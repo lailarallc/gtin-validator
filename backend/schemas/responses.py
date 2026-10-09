@@ -158,6 +158,13 @@ class ValidationResponse(BaseModel):
     gtin14_suggestions: list[GTIN14SuggestionOut]
 
 
+class SummaryResponse(BaseModel):
+    """Own-data result: score and issue counts only. No rows, no token."""
+
+    summary: BatchSummaryOut
+    score: ScoreResultOut
+
+
 class UploadColumnsResponse(BaseModel):
     columns: list[str]
     detected_gtin_column: str | None
