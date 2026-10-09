@@ -1,8 +1,8 @@
 # GTIN Validator — Free App Limit Plan
 
 **Source:** Free app limit build plan (2026-10-07)
-**Branch:** `free-app-limit` — PR only, do not merge. Merge on launch day (Fri 2026-10-16) once the kit is on Payhip and lailarallc.com/kits/gtin-validator is live.
-**Status:** Built — PR open, merge on launch day (2026-10-16)
+**Branch:** `free-app-limit` — squash-merged as PR #16 on 2026-10-09, when Shawn moved the launch up from Fri 2026-10-16. The kit was Visible on Payhip and lailarallc.com/kits/gtin-validator was live first.
+**Status:** Merged 2026-10-09
 
 **Goal:** Sample data keeps the full report and downloads. Own data (upload or paste) shows only score, grade, and issue counts, with no row-level detail and no downloads, and points to the GTIN Validator Kit. The server enforces the limit.
 
