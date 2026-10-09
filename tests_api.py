@@ -82,6 +82,21 @@ class TestValidateText:
         resp = await client.post("/api/validate", json={"gtins": []})
         assert resp.status_code == 400
 
+    @pytest.mark.anyio
+    async def test_gtins_on_one_line_counted_separately(self, client):
+        resp = await client.post(
+            "/api/validate", json={"gtins": ["614141000012 614141000019, 12345"]}
+        )
+        assert resp.status_code == 200
+        summary = resp.json()["summary"]
+        assert summary["total_gtins"] == 3
+        assert summary["critical_issues"] == 2
+
+    @pytest.mark.anyio
+    async def test_blank_entries_rejected(self, client):
+        resp = await client.post("/api/validate", json={"gtins": ["", "  "]})
+        assert resp.status_code == 400
+
 
 # ---------------------------------------------------------------------------
 # Validation — sample data (the only path that returns the full report)
