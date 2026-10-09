@@ -14,6 +14,7 @@ References:
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from dataclasses import dataclass, field
 from enum import Enum
@@ -401,6 +402,39 @@ def validate_single_gtin(raw: str, row_number: int) -> GTINResult:
         result.company_prefix = cleaned[:4]
 
     return result
+
+
+# =============================================================================
+# Pasted input
+# =============================================================================
+
+_ENTRY_SEPARATORS = re.compile(r"[\r\n\t,;]+")
+
+
+def split_gtin_entries(entries: list[str]) -> list[str]:
+    """
+    Split pasted text into one string per GTIN.
+
+    Line breaks, tabs, commas, and semicolons always separate GTINs.
+    Spaces are ambiguous: a barcode number as printed puts spaces between
+    groups of six digits or fewer (0 36000 29145 2). So a piece is split
+    on spaces only when one of its parts has seven or more digits.
+    Otherwise it stays one entry, and validate_single_gtin removes the
+    spaces. Blank pieces are dropped.
+    """
+    out: list[str] = []
+    for entry in entries:
+        for piece in _ENTRY_SEPARATORS.split(entry):
+            parts = piece.split()
+            if not parts:
+                continue
+            if len(parts) > 1 and any(
+                sum(ch.isdigit() for ch in part) >= 7 for part in parts
+            ):
+                out.extend(parts)
+            else:
+                out.append(piece.strip())
+    return out
 
 
 # =============================================================================

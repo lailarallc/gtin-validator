@@ -16,6 +16,7 @@ from gtin_core import (
     generate_fix_roadmap,
     generate_gtin14_suggestions,
     identify_gtin_type,
+    split_gtin_entries,
     validate_batch,
     validate_single_gtin,
 )
@@ -215,6 +216,48 @@ class TestBatchValidation:
         ])
         assert data["score"]["score"] >= 70
         assert data["summary"]["critical_issues"] == 0
+
+
+# =========================================================================
+# Pasted input
+# =========================================================================
+
+class TestSplitGtinEntries:
+    def test_one_per_line_unchanged(self):
+        assert split_gtin_entries(["614141000012", "614141000029"]) == [
+            "614141000012",
+            "614141000029",
+        ]
+
+    def test_commas_semicolons_tabs_and_line_breaks(self):
+        assert split_gtin_entries(
+            ["614141000012, 614141000029;614141000036\t614141000043\n614141000050"]
+        ) == [
+            "614141000012",
+            "614141000029",
+            "614141000036",
+            "614141000043",
+            "614141000050",
+        ]
+
+    def test_spaces_between_gtins(self):
+        assert split_gtin_entries(["614141000012 614141000019 12345"]) == [
+            "614141000012",
+            "614141000019",
+            "12345",
+        ]
+
+    def test_printed_spaces_stay_one_gtin(self):
+        entries = split_gtin_entries(["6 14141 00001 2"])
+        assert entries == ["6 14141 00001 2"]
+        data = validate_batch(entries)
+        assert data["summary"]["total_gtins"] == 1
+        assert data["summary"]["critical_issues"] == 0
+
+    def test_blank_pieces_dropped(self):
+        assert split_gtin_entries(["", "   ", "614141000012,,", " ;\t"]) == [
+            "614141000012"
+        ]
 
 
 # =========================================================================

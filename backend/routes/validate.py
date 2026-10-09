@@ -25,6 +25,7 @@ from gtin_core import (
     generate_executive_summary,
     generate_fix_roadmap,
     generate_gtin14_suggestions,
+    split_gtin_entries,
     validate_batch,
 )
 from sample_data import SAMPLE_DATA
@@ -110,9 +111,10 @@ def validate_sample(request: Request) -> dict:
 @router.post("/validate", response_model=SummaryResponse, responses={429: {"description": "Rate limit exceeded"}})
 @limiter.limit("10/minute")
 def validate_text(request: Request, body: ValidateTextRequest) -> SummaryResponse:
-    if not body.gtins:
+    gtins = split_gtin_entries(body.gtins)
+    if not gtins:
         raise HTTPException(400, "No GTINs provided.")
-    return _run_summary(body.gtins)
+    return _run_summary(gtins)
 
 
 @router.post(
