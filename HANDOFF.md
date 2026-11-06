@@ -6,6 +6,18 @@
 **CI:** 11 checks green on PR #17. Local: 99 tests (tests.py, test_golden.py, tests_api.py), ruff, mypy
 **Live URL:** https://gtin.lailarallc.com
 
+## 2026-11-06 — Wrap of the free-app-limit build session
+
+**Started from:** The 2026-10-07 build session (PR #16), left open after the PR was opened.
+
+**Did:** Kit v1.0.1 tag: checked before pushing and found Shawn had already pushed it on `fa3d3a5`; the release run succeeded and `GTIN-Validator-Kit.html` is published, so nothing was pushed from here. Pulled `main` (fast-forward only) in gtin-validator (switched off `free-app-limit` first), lailara-website (`reference/lailara-website/site`), and gtin-validator-kit. Stopped the local preview servers. No code changes.
+
+**State:** main at ef1b840 (Fly scale-to-zero), clean. The local `free-app-limit` branch still exists; it was squash-merged as #16, so `git branch -d` refuses it and it needs `-D`. Not deleted.
+
+**Next:** Optional: `git branch -D free-app-limit`. Next `/improve` due 2026-12-22. The 2026-09-23 audit findings (quadratic duplicate detection / OOM risk, `ENVIRONMENT=production` unset so `/api/docs` is live, non-ASCII digit 500, rate limiter keyed on the proxy IP) are still open.
+
+---
+
 ## 2026-10-09 — Launch moved up; PR #16 and PR #17 merged
 
 **What changed:** Shawn moved the kit launch up from 2026-10-16 to today. In order: the kit page (lailara-website #2) merged and verified live, the Payhip product switched from Unlisted to Visible, then PR #16 squash-merged (5e11aec).
